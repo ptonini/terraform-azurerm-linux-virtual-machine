@@ -13,14 +13,16 @@ locals {
 }
 
 module "security_group" {
-  source = "github.com/ptonini/terraform-azurerm-network-security-group?ref=v1"
+  source = "ptonini/network-security-group/azurerm"
+  version = "~> 1.0.0"
   name = "${var.rg.name}-${var.name}"
   rg = var.rg
   network_rules = var.network_rules
 }
 
 module "network_interface" {
-  source = "github.com/ptonini/terraform-azurerm-network-interface?ref=v1"
+  source = "ptonini/network-interface/azurerm"
+  version = "~> 1.0.0"
   count = var.host_count
   name = "${var.rg.name}-${var.name}${format("%04.0f", count.index + 1)}"
   rg = var.rg
@@ -86,7 +88,8 @@ resource "azurerm_linux_virtual_machine" "this" {
 }
 
 module "extra_disks" {
-  source = "github.com/ptonini/terraform-azurerm-managed-disk?ref=v1"
+  source = "ptonini/managed-disk/azurerm"
+  version = "~> 1.0.0"
   for_each = local.extra_disks
   name = each.value["fullname"]
   rg = var.rg
