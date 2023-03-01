@@ -97,4 +97,7 @@ module "extra_disks" {
   disk_size_gb = each.value["disk_size_gb"]
   virtual_machine_id = azurerm_linux_virtual_machine.this[each.value["host_index"]].id
   virtual_machine_attachment_lun = 10 + index(keys(var.extra_disks), each.value["basename"])
+  depends_on = [
+    azurerm_linux_virtual_machine.this
+  ]
 }
