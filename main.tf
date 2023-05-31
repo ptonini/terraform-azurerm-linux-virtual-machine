@@ -14,15 +14,16 @@ locals {
 
 module "security_group" {
   source        = "ptonini/network-security-group/azurerm"
-  version       = "~> 1.0.0"
+  version       = "~> 1.0.2"
   name          = "${var.rg.name}-${var.name}"
   rg            = var.rg
   network_rules = var.network_rules
+
 }
 
 module "network_interface" {
   source            = "ptonini/network-interface/azurerm"
-  version           = "~> 1.0.0"
+  version           = "~> 1.0.2"
   count             = var.host_count
   name              = "${var.rg.name}-${var.name}${format("%04.0f", count.index + 1)}"
   rg                = var.rg
@@ -94,7 +95,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 
 module "extra_disks" {
   source                         = "ptonini/managed-disk/azurerm"
-  version                        = "~> 1.0.0"
+  version                        = "~> 1.0.2"
   for_each                       = local.extra_disks
   name                           = each.value["fullname"]
   rg                             = var.rg
