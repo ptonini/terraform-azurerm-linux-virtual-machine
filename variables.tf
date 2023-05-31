@@ -14,11 +14,11 @@ variable "ssh_key" {}
 
 variable "public_access" {
   default = false
-  type = bool
+  type    = bool
 }
 
 variable "host_count" {
-  type = number
+  type    = number
   default = 1
 }
 
@@ -43,7 +43,7 @@ variable "plan" {
 }
 
 variable "snapshot" {
-  type = string
+  type    = string
   default = "true"
 }
 
@@ -60,7 +60,7 @@ variable "tags" {
 }
 
 variable "high_availability" {
-  type = bool
+  type    = bool
   default = false
 }
 
@@ -75,6 +75,6 @@ variable "identity_type" {
 }
 
 variable "identity_ids" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
