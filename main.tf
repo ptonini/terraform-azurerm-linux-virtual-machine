@@ -52,6 +52,9 @@ resource "azurerm_linux_virtual_machine" "this" {
     module.network_interface[count.index].this.id
   ]
   source_image_id = var.source_image_id
+  max_bid_price   = var.max_bid_price
+  priority        = var.priority
+  eviction_policy = var.eviction_policy
   admin_ssh_key {
     username   = var.admin_username
     public_key = var.ssh_key

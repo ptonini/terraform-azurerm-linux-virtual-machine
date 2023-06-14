@@ -78,3 +78,15 @@ variable "identity_ids" {
   type    = list(string)
   default = null
 }
+
+variable "priority" {
+  default = "Regular"
+}
+
+variable "max_bid_price" {
+  default = -1
+}
+
+variable "eviction_policy" {
+  default = null
+}
