@@ -1,15 +1,15 @@
 locals {
-  extra_disks = { for disk in flatten([
-    for host_index in range(var.host_count) : [
+  extra_disks = { for d in flatten([
+    for i in range(var.host_count) : [
       for k, v in var.extra_disks : {
         basename             = k
-        fullname             = "${var.rg.name}-${var.name}${format("%04.0f", host_index + 1)}-${k}"
-        host_index           = host_index
+        host_index           = i
+        fullname             = "${var.rg.name}-${var.name}${format("%04.0f", i + 1)}-${k}"
         storage_account_type = v["storage_account_type"]
         disk_size_gb         = v["disk_size_gb"]
       }
     ]
-  ]) : disk.fullname => disk }
+  ]) : d.fullname => d }
   extensions = { for e in flatten([
     for i in range(var.host_count) : [
       for k, v in var.extensions : {
@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine" "this" {
     storage_account_uri = var.boot_diagnostics_storage_account.primary_blob_endpoint
   }
   dynamic "source_image_reference" {
-    for_each = var.source_image_reference == null ? {} : { 1 = var.source_image_reference }
+    for_each = var.source_image_reference == null ? {} : { 0 = var.source_image_reference }
     content {
       publisher = source_image_reference.value["publisher"]
       offer     = source_image_reference.value["offer"]
@@ -90,7 +90,7 @@ resource "azurerm_linux_virtual_machine" "this" {
     }
   }
   dynamic "plan" {
-    for_each = var.plan == null ? {} : { 1 = var.plan }
+    for_each = var.plan == null ? {} : { 0 = var.plan }
     content {
       name      = plan.value["name"]
       product   = plan.value["product"]
@@ -111,8 +111,8 @@ resource "azurerm_linux_virtual_machine" "this" {
 
 resource "azurerm_virtual_machine_extension" "this" {
   for_each                   = local.extensions
-  name                       = each.key
   virtual_machine_id         = azurerm_linux_virtual_machine.this[each.value["host_index"]].id
+  name                       = each.value["type"]
   publisher                  = each.value["publisher"]
   type                       = each.value["type"]
   auto_upgrade_minor_version = each.value["auto_upgrade_minor_version"]
@@ -126,18 +126,14 @@ resource "azurerm_virtual_machine_extension" "this" {
   }
 }
 
-
 module "extra_disks" {
   source                         = "ptonini/managed-disk/azurerm"
   version                        = "~> 1.0.2"
   for_each                       = local.extra_disks
-  name                           = each.value["fullname"]
   rg                             = var.rg
+  virtual_machine_id             = azurerm_linux_virtual_machine.this[each.value["host_index"]].id
+  name                           = each.value["fullname"]
   storage_account_type           = each.value["storage_account_type"]
   disk_size_gb                   = each.value["disk_size_gb"]
-  virtual_machine_id             = azurerm_linux_virtual_machine.this[each.value["host_index"]].id
   virtual_machine_attachment_lun = 10 + index(keys(var.extra_disks), each.value["basename"])
-  depends_on = [
-    azurerm_linux_virtual_machine.this
-  ]
 }
