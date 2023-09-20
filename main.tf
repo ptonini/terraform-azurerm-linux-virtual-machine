@@ -96,6 +96,24 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 }
 
+resource "azurerm_virtual_machine_extension" "this" {
+  for_each                   = var.extensions
+  name                       = each.key
+  virtual_machine_id         = azurerm_linux_virtual_machine.this.id
+  publisher                  = each.value.publisher
+  type                       = each.value.type
+  auto_upgrade_minor_version = each.value.auto_upgrade_minor_version
+  type_handler_version       = each.value.type_handler_version
+  settings                   = each.value.settings
+  protected_settings         = each.value.protected_settings
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
+}
+
+
 module "extra_disks" {
   source                         = "ptonini/managed-disk/azurerm"
   version                        = "~> 1.0.2"

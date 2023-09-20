@@ -90,3 +90,15 @@ variable "max_bid_price" {
 variable "eviction_policy" {
   default = null
 }
+
+variable "extensions" {
+  type = map(object({
+    publisher                  = string
+    type                       = string
+    auto_upgrade_minor_version = optional(bool, true)
+    type_handler_version       = string
+    settings                   = string
+    protected_settings         = string
+  }))
+  default = {}
+}
