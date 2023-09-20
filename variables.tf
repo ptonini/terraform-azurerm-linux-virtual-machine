@@ -97,8 +97,8 @@ variable "extensions" {
     type                       = string
     auto_upgrade_minor_version = optional(bool, true)
     type_handler_version       = string
-    settings                   = string
-    protected_settings         = string
+    settings                   = optional(string)
+    protected_settings         = optional(string)
   }))
   default = {}
 }

@@ -14,7 +14,7 @@ locals {
     for i in range(var.host_count) : [
       for k, v in var.extensions : {
         name                       = "${k}-${i}"
-        host_index                 = host_index
+        host_index                 = i
         publisher                  = v["publisher"]
         type                       = v["type"]
         auto_upgrade_minor_version = v["auto_upgrade_minor_version"]
@@ -32,7 +32,6 @@ module "security_group" {
   name          = "${var.rg.name}-${var.name}"
   rg            = var.rg
   network_rules = var.network_rules
-
 }
 
 module "network_interface" {
