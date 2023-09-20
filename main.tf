@@ -10,6 +10,20 @@ locals {
       }
     ]
   ]) : disk.fullname => disk }
+  extensions = { for e in flatten([
+    for i in range(var.host_count) : [
+      for k, v in var.extensions : {
+        name                       = "${k}-${i}"
+        host_index                 = host_index
+        publisher                  = v["publisher"]
+        type                       = v["type"]
+        auto_upgrade_minor_version = v["auto_upgrade_minor_version"]
+        type_handler_version       = v["type_handler_version"]
+        settings                   = v["settings"]
+        protected_settings         = v["protected_settings"]
+      }
+    ]
+  ]) : e.name => e }
 }
 
 module "security_group" {
@@ -97,15 +111,15 @@ resource "azurerm_linux_virtual_machine" "this" {
 }
 
 resource "azurerm_virtual_machine_extension" "this" {
-  for_each                   = var.extensions
+  for_each                   = local.extensions
   name                       = each.key
-  virtual_machine_id         = azurerm_linux_virtual_machine.this.id
-  publisher                  = each.value.publisher
-  type                       = each.value.type
-  auto_upgrade_minor_version = each.value.auto_upgrade_minor_version
-  type_handler_version       = each.value.type_handler_version
-  settings                   = each.value.settings
-  protected_settings         = each.value.protected_settings
+  virtual_machine_id         = azurerm_linux_virtual_machine.this[each.value["host_index"]].id
+  publisher                  = each.value["publisher"]
+  type                       = each.value["type"]
+  auto_upgrade_minor_version = each.value["auto_upgrade_minor_version"]
+  type_handler_version       = each.value["type_handler_version"]
+  settings                   = each.value["settings"]
+  protected_settings         = each.value["protected_settings"]
   lifecycle {
     ignore_changes = [
       tags
