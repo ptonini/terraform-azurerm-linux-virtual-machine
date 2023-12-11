@@ -5,8 +5,8 @@ locals {
         basename             = k
         host_index           = i
         fullname             = "${var.name}${format("%04.0f", i + 1)}-${k}"
-        storage_account_type = v["storage_account_type"]
-        disk_size_gb         = v["disk_size_gb"]
+        storage_account_type = v.storage_account_type
+        disk_size_gb         = v.disk_size_gb
       }
     ]
   ]) : d.fullname => d }
@@ -15,12 +15,12 @@ locals {
       for k, v in var.extensions : {
         name                       = "${k}-${i}"
         host_index                 = i
-        publisher                  = v["publisher"]
-        type                       = v["type"]
-        auto_upgrade_minor_version = v["auto_upgrade_minor_version"]
-        type_handler_version       = v["type_handler_version"]
-        settings                   = v["settings"]
-        protected_settings         = v["protected_settings"]
+        publisher                  = v.publisher
+        type                       = v.type
+        auto_upgrade_minor_version = v.auto_upgrade_minor_version
+        type_handler_version       = v.type_handler_version
+        settings                   = v.settings
+        protected_settings         = v.protected_settings
       }
     ]
   ]) : e.name => e }
@@ -104,10 +104,10 @@ resource "azurerm_linux_virtual_machine" "this" {
   tags = var.tags
   lifecycle {
     ignore_changes = [
-      tags.business_unit,
-      tags.environment,
-      tags.product,
-      tags.subscription_type
+      tags["business_unit"],
+      tags["environment"],
+      tags["product"],
+      tags["subscription_type"]
     ]
   }
 }
@@ -124,10 +124,10 @@ resource "azurerm_virtual_machine_extension" "this" {
   protected_settings         = each.value["protected_settings"]
   lifecycle {
     ignore_changes = [
-      tags.business_unit,
-      tags.environment,
-      tags.product,
-      tags.subscription_type
+      tags["business_unit"],
+      tags["environment"],
+      tags["product"],
+      tags["subscription_type"]
     ]
   }
 }
