@@ -36,7 +36,7 @@ module "security_group" {
 
 module "network_interface" {
   source            = "ptonini/network-interface/azurerm"
-  version           = "~> 1.0.3"
+  version           = "1.0.3"
   count             = var.host_count
   name              = "${var.rg.name}-${var.name}${format("%04.0f", count.index + 1)}"
   rg                = var.rg
